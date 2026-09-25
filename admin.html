@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>录入后台管理</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body{padding:20px;max-width:1100px;margin:0 auto;font-family:system-ui}
+        h1{text-align:center;margin-bottom:20px}
+        table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px #00000014}
+        th,td{border:1px solid #eee;padding:12px;text-align:left}
+        th{background:#2563eb;color:white}
+    </style>
+</head>
+<body>
+    <h1>录入记录后台</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>原文</th>
+                <th>录入内容</th>
+                <th>字数</th>
+                <th>提交时间</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+<script>
+// =========这里改你的信息=========
+const SUPABASE_URL = "https://doxqfdwkhokegqbdtisd.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NYcmKv-hc9yMlXV5BrRv3w__8aQHQ4v";
+// =================================
+const { createClient } = supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+window.onload = async function(){
+    const {data,error}=await supabase.from('records').select('*').order('created_at',{ascending:false});
+    if(error){
+        document.getElementById('tableBody').innerHTML=`<tr><td colspan="5">加载失败：${error.message}</td></tr>`;
+        return;
+    }
+    const tbody = document.getElementById('tableBody');
+    data.forEach(item=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML=`
+            <td>${item.id}</td>
+            <td>${item.source_text}</td>
+            <td>${item.input_text}</td>
+            <td>${item.word_count}</td>
+            <td>${new Date(item.created_at).toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+    })
+}
+</script>
+</body>
+</html>

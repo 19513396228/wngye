@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字录入系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
+        body{background:#f4f6f8;padding:20px;max-width:900px;margin:0 auto}
+        h1{text-align:center;color:#222;margin-bottom:24px}
+        .card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 10px #00000015;margin-bottom:20px}
+        textarea{width:100%;min-height:140px;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px}
+        button{padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;margin-top:12px}
+        button:hover{background:#1d4ed8}
+        .tip{margin-top:12px;color:#444}
+    </style>
+</head>
+<body>
+    <h1>文字录入提交</h1>
+    <div class="card">
+        <h3>原文</h3>
+        <textarea id="sourceText" placeholder="在这里粘贴需要录入的原文"></textarea>
+        <h3 style="margin-top:12px;">录入内容</h3>
+        <textarea id="inputText" placeholder="在这里输入录入文字"></textarea>
+        <button onclick="submitData()">提交保存</button>
+        <div class="tip" id="msg"></div>
+    </div>
+
+<script>
+// =========这里改你的信息=========
+const SUPABASE_URL = "https://doxqfdwkhokegqbdtisd.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NYcmKv-hc9yMlXV5BrRv3w__8aQHQ4v";
+// =================================
+const { createClient } = supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function submitData(){
+    const sourceText = document.getElementById('sourceText').value;
+    const inputText = document.getElementById('inputText').value;
+    const msgDom = document.getElementById('msg');
+    if(!sourceText || !inputText){
+        msgDom.innerText = "原文和录入内容不能为空";
+        msgDom.style.color="red";
+        return;
+    }
+    const {error} = await supabase
+        .from('records')
+        .insert([
+            {
+                source_text: sourceText,
+                input_text: inputText,
+                word_count: inputText.length
+            }
+        ]);
+    if(error){
+        msgDom.innerText="提交失败："+error.message;
+        msgDom.style.color="red";
+    }else{
+        msgDom.innerText="✅提交成功！";
+        msgDom.style.color="green";
+        document.getElementById('sourceText').value="";
+        document.getElementById('inputText').value="";
+    }
+}
+</script>
+</body>
+</html>
